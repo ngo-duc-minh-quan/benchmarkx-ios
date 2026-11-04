@@ -189,24 +189,27 @@ final class MetalRenderer: NSObject, MTKViewDelegate {
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {}
 
     func draw(in view: MTKView) {
+        guard let drawable = view.currentDrawable,
+              let passDescriptor = view.currentRenderPassDescriptor,
+              let commandBuffer = commandQueue.makeCommandBuffer(),
+              let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: passDescriptor) else {
+            return
+        }
+
+        // Count the frame only once it can be drawn, and before the semaphore wait,
+        // so the wait time falls into the next frame's interval.
         let now = CACurrentMediaTime()
         let measuring = isMeasuring
         var t = now
         if measuring {
             sampler.tick(timestamp: now)
             if sampler.elapsed >= measureDuration {
+                encoder.endEncoding()   // the encoder already exists: end it before dropping the frame
                 isMeasuring = false
                 onFinished?(measureDuration)
                 return
             }
             t = sampler.elapsed
-        }
-
-        guard let drawable = view.currentDrawable,
-              let passDescriptor = view.currentRenderPassDescriptor,
-              let commandBuffer = commandQueue.makeCommandBuffer(),
-              let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: passDescriptor) else {
-            return
         }
 
         inFlight.wait()
