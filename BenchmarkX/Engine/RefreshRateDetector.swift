@@ -17,6 +17,7 @@ final class RefreshRateDetector: NSObject {
     private var completion: ((Int) -> Void)?
 
     /// Calls `completion` once, on the main thread, with the snapped refresh rate.
+    /// If `cancel()` is called first, `completion` is never called.
     func detect(completion: @escaping (Int) -> Void) {
         guard displayLink == nil else { return }
         self.completion = completion
@@ -26,6 +27,13 @@ final class RefreshRateDetector: NSObject {
         let link = CADisplayLink(target: self, selector: #selector(onFrame(_:)))
         link.add(to: .main, forMode: .common)
         displayLink = link
+    }
+
+    /// Stops a detection in progress without calling its completion. Safe to call at any time.
+    func cancel() {
+        displayLink?.invalidate()
+        displayLink = nil
+        completion = nil
     }
 
     /// Snaps a raw Hz value to the nearest standard rate.
