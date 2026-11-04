@@ -110,7 +110,9 @@ enum CPUBenchmark {
         return count
     }
 
-    /// size x size matrix multiplication (i-k-j loop) on deterministic data. Returns c[0].
+    /// size x size matrix multiplication (i-k-j loop) on deterministic data.
+    /// Returns the sum of every element of the result. Returning only c[0] would let the
+    /// optimizer drop the other elements, and c[0] is always 0 when size is 100.
     static func matMul(size: Int) -> Double {
         let n = size * size
         var a = [Double](repeating: 0, count: n)
@@ -130,7 +132,7 @@ enum CPUBenchmark {
                 }
             }
         }
-        return c[0]
+        return c.reduce(0, +)
     }
 
     private static func runWorkUnit() -> Double {

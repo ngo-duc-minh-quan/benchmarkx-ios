@@ -7,9 +7,17 @@ final class CPUBenchmarkTests: XCTestCase {
     }
 
     func testMatMulIsDeterministic() {
-        // c[0] = a[1]*b[3] + a[2]*b[6] = 0.17*0.93 + 0.34*0.86
-        XCTAssertEqual(CPUBenchmark.matMul(size: 3), 0.4505, accuracy: 1e-9)
-        XCTAssertEqual(CPUBenchmark.matMul(size: 3), CPUBenchmark.matMul(size: 3))
+        XCTAssertEqual(CPUBenchmark.matMul(size: 10), CPUBenchmark.matMul(size: 10))
+    }
+
+    func testMatMulReturnsSumOfAllElements() {
+        // Sum of the whole 3x3 result matrix (reference computed independently).
+        XCTAssertEqual(CPUBenchmark.matMul(size: 3), 4.6222, accuracy: 1e-9)
+    }
+
+    func testMatMulSize100IsNotZero() {
+        // c[0] is always 0 for size 100, so the checksum must cover the whole matrix.
+        XCTAssertNotEqual(CPUBenchmark.matMul(size: 100), 0)
     }
 
     func testNormalizeSingleCoreCapsAt100() {
