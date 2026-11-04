@@ -23,7 +23,7 @@ This project follows Atlassian Gitflow. Full rules: `git-flow.md`.
 
 **Branch naming:**
 - Lowercase, hyphens between words, underscore to separate segments
-- Always include issue ID: `feature/#123_add-gpu-benchmark`
+- Include issue ID when a tracker exists: `feature/#123_add-gpu-benchmark`. No tracker: omit it, e.g. `feature/ios-folder-structure`
 - Forbidden: `temp`, `test`, `wip`, `new-branch`, accented Vietnamese characters
 
 ### Commit Format
