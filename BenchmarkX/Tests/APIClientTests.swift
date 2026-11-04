@@ -25,7 +25,11 @@ final class APIClientTests: XCTestCase {
         gpuRenderer: "Apple A13 GPU (hardware)",
         screenWidth: 414,
         screenHeight: 896,
-        pixelRatio: 2
+        pixelRatio: 2,
+        freeRAMGB: 1.5,
+        batteryLevel: 80,
+        batteryCharging: false,
+        batterySupported: true
     )
 
     func testMakePayloadBuildsBrowserString() {

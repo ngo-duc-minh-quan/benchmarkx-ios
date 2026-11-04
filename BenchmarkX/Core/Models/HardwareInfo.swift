@@ -10,4 +10,9 @@ struct HardwareInfo {
     let screenWidth: Double
     let screenHeight: Double
     let pixelRatio: Double
+    let freeRAMGB: Double
+    /// 0...100. 100 when the battery is unsupported, like RN.
+    let batteryLevel: Int
+    let batteryCharging: Bool
+    let batterySupported: Bool
 }
