@@ -35,6 +35,9 @@ final class BenchmarkRunner {
     var onLiveStats: ((Double, Double, Double?, Bool, Int) -> Void)?
     var onComplete: ((BenchmarkResult) -> Void)?
     var onError: ((String) -> Void)?
+    /// Called once on the main thread when the refresh rate measurement finishes, even if it equals the
+    /// default 60. Set it right after creating the runner: the measurement needs at least 60 display frames.
+    var onDetectedHz: ((Int) -> Void)?
 
     private let view: MTKView
     private let renderer: MetalRenderer?
@@ -66,7 +69,10 @@ final class BenchmarkRunner {
         UIDevice.current.isBatteryMonitoringEnabled = true
 
         // Like RN: detect in the background once the view exists, not when the test starts.
-        refreshRateDetector.detect { [weak self] hz in self?.detectedHz = hz }
+        refreshRateDetector.detect { [weak self] hz in
+            self?.detectedHz = hz
+            self?.onDetectedHz?(hz)
+        }
     }
 
     deinit {
