@@ -36,6 +36,7 @@ final class BenchmarkRunner {
     var onComplete: ((BenchmarkResult) -> Void)?
     var onError: ((String) -> Void)?
 
+    private let view: MTKView
     private let renderer: MetalRenderer?
     private let setupError: String?
     private let refreshRateDetector = RefreshRateDetector()
@@ -51,6 +52,7 @@ final class BenchmarkRunner {
     private var publishedSampleCount = 0
 
     init(view: MTKView) {
+        self.view = view
         do {
             renderer = try MetalRenderer(view: view)
             setupError = nil
@@ -91,6 +93,8 @@ final class BenchmarkRunner {
 
         onProgress?(0)
         onLiveStats?(0, 0, nil, false, 0)
+        // Like RN, stop the preview: drawing 4000 cubes must not compete with the CPU benchmark.
+        view.isPaused = true
         state = .cpu
 
         let cores = ProcessInfo.processInfo.activeProcessorCount
@@ -110,6 +114,7 @@ final class BenchmarkRunner {
         progressTimer?.invalidate()
         progressTimer = nil
         renderer?.stopMeasuring()
+        view.isPaused = false
         cpuOutcome = nil
         onProgress?(0)
         state = .idle
@@ -128,6 +133,7 @@ final class BenchmarkRunner {
             cores: cores
         )
 
+        view.isPaused = false
         state = .running
         renderer.startMeasuring(duration: runDuration)
 
